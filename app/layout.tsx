@@ -8,7 +8,6 @@ export const metadata: Metadata = {
   title: 'Vanish — encrypted notes that expire',
   description:
     'Write a note, set when it should expire, share a link. End-to-end encrypted in your browser. The server never sees your text or your key.',
-  robots: { index: false, follow: false },
   openGraph: {
     type: 'website',
     url: SITE_URL,
