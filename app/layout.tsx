@@ -18,9 +18,11 @@ export const metadata: Metadata = {
       'End-to-end encrypted notes and short links. The server only ever sees ciphertext.',
     images: [
       {
-        url: '/api/og',
+        url: `${SITE_URL}/og.png`,
+        secureUrl: `${SITE_URL}/og.png`,
         width: 1200,
         height: 630,
+        type: 'image/png',
         alt: 'Vanish — end-to-end encrypted notes that expire',
       },
     ],
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
     title: 'Vanish — encrypted notes that expire',
     description:
       'End-to-end encrypted notes and short links. The server only ever sees ciphertext.',
-    images: ['/api/og'],
+    images: [`${SITE_URL}/og.png`],
   },
 };
 
