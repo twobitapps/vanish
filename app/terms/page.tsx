@@ -107,9 +107,12 @@ export default function TermsPage() {
 
       <h3>8. No accounts, no personal data</h3>
       <p>
-        Vanish does not require an account and does not collect personal information. Standard
-        web request metadata (IP, user-agent, timing) may be logged briefly by our hosting
-        provider; see <a href="/security">/security</a>.
+        Vanish does not require an account and does not collect personal information. A
+        Cloudflare Worker strips every identifying header (IP, user-agent, language,
+        client-hints, geo) before requests reach our application server, so our application
+        logs record <code>0.0.0.0</code> and a constant user-agent. Cloudflare itself observes
+        real client IPs briefly at its edge. See{' '}
+        <a href="/security">/security</a> for the full picture.
       </p>
 
       <h3>9. Changes and termination</h3>

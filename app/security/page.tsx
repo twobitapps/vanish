@@ -157,11 +157,26 @@ export default function SecurityPage() {
           >
             github.com/twobitapps/vanish
           </a>
-          . The files responsible for encryption are small and easy to read:{' '}
-          <code>lib/crypto.ts</code> (AES-GCM, PBKDF2, HKDF helpers) and{' '}
-          <code>app/page.tsx</code> (the create flow). Nothing else touches the plaintext or
-          the password.
+          . The files you want to read:
         </p>
+        <ul>
+          <li>
+            <code>lib/crypto.ts</code> — AES-GCM, PBKDF2, HKDF helpers
+          </li>
+          <li>
+            <code>app/page.tsx</code> — the create flow (the only place plaintext exists on the
+            send side)
+          </li>
+          <li>
+            <code>app/m/[id]/page.tsx</code> — the view flow (the only place plaintext exists on
+            the receive side)
+          </li>
+          <li>
+            <code>edge/worker.js</code> — the Cloudflare Worker that strips identifying headers
+            before requests reach our origin
+          </li>
+        </ul>
+        <p>Nothing else touches the plaintext or the password.</p>
       </section>
 
       <section className="card security-sections" id="password">
@@ -191,6 +206,69 @@ export default function SecurityPage() {
           Strength note: a good password is worth more than a long one. A memorable 4-word
           diceware phrase beats a complicated short string. Avoid anything you&apos;ve reused
           from elsewhere.
+        </p>
+      </section>
+
+      <section className="card security-sections" id="auto-vanish">
+        <h3>Auto-vanish, on both sides</h3>
+        <p>
+          The server side is simple: Upstash Redis holds the ciphertext with a server-set TTL.
+          The moment the TTL elapses, the blob is dropped — no cleanup cron, no stale writes.
+        </p>
+        <p>
+          The client side is where most &ldquo;expiring note&rdquo; tools drop the ball. Vanish
+          doesn&apos;t. When the countdown hits zero in an open tab, the view page flips to a{' '}
+          <em>vanished</em> state and drops the plaintext reference from React state in the same
+          tick, so the string becomes unreachable from any running code. We disable the
+          browser&apos;s back-forward cache on view pages (<code>Cache-Control: no-store</code>),
+          so navigating back cannot resurrect the note from bfcache memory. And a{' '}
+          <code>visibilitychange</code> + <code>focus</code> listener re-checks expiry the moment
+          a backgrounded tab returns to the foreground, so a tab left open for hours cannot
+          display a stale note after its TTL has passed.
+        </p>
+      </section>
+
+      <section className="card security-sections" id="edge">
+        <h3>A log-stripping edge proxy</h3>
+        <p>
+          Requests to <code>hy.gl</code> do not reach the application server directly. They
+          arrive at a <strong>Cloudflare Worker</strong> whose only job is to strip every
+          identifying header from the request before forwarding to our Vercel origin:
+        </p>
+        <ul>
+          <li>
+            IP markers: <code>X-Forwarded-For</code>, <code>CF-Connecting-IP</code>,{' '}
+            <code>X-Real-IP</code>, <code>True-Client-IP</code>, <code>Forwarded</code>
+          </li>
+          <li>
+            Geo signals: <code>CF-IPCountry</code>, <code>CF-IPCity</code>,{' '}
+            <code>CF-IPContinent</code>, <code>CF-IPLatitude/Longitude</code>,{' '}
+            <code>CF-Region</code>, <code>CF-Timezone</code>
+          </li>
+          <li>
+            Fingerprints: <code>User-Agent</code>, <code>Accept-Language</code>,{' '}
+            <code>Referer</code>, every <code>Sec-CH-UA-*</code> client hint,{' '}
+            <code>Device-Memory</code>, <code>Viewport-Width</code>
+          </li>
+        </ul>
+        <p>
+          By the time a request reaches our application logs, the IP is <code>0.0.0.0</code> and
+          the user-agent is the constant <code>vanish-edge</code>. No geo, no language, no
+          browser fingerprint — nothing distinguishing one visitor from another beyond request
+          timing and size.
+        </p>
+        <p>
+          Cloudflare itself still sees real client IPs for a short retention window at the edge.
+          That is the remaining single-vendor trust. If you need anonymity stronger than that,
+          reach the site through Tor or a VPN. The Worker&apos;s source is public at{' '}
+          <a
+            href="https://github.com/twobitapps/vanish/blob/main/edge/worker.js"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            edge/worker.js
+          </a>{' '}
+          — every header in the strip list is readable in one file.
         </p>
       </section>
 
@@ -239,13 +317,9 @@ export default function SecurityPage() {
             don&apos;t trust before pasting a secret.
           </li>
           <li>
-            <strong>A Cloudflare Worker sits in front of the application.</strong> It strips
-            every identifying header — IP, user-agent, language, client-hints, geo — before the
-            request reaches our Vercel origin, so our application logs record{' '}
-            <code>0.0.0.0</code> and a constant user-agent. The source of the Worker is in the
-            public repo at <code>edge/worker.js</code>. Cloudflare itself still sees the real
-            client IP for a short retention window at the edge; that&apos;s the remaining
-            single-vendor trust. For stronger anonymity, reach the site via Tor or a VPN.
+            <strong>Cloudflare (our edge) still sees real IPs briefly.</strong> See{' '}
+            <a href="#edge">A log-stripping edge proxy</a> above for what we do about it and
+            what we can&apos;t. For stronger anonymity, reach the site via Tor or a VPN.
           </li>
         </ul>
       </section>
