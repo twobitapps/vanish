@@ -104,8 +104,11 @@ export default function SecurityPage() {
           <span className="yes">yes</span>
           <span className="row-label">Whether a password is required (presence of the salt field)</span>
           <span className="yes">yes</span>
-          <span className="row-label">Your IP address (standard web request logs, ~1h retention)</span>
-          <span className="yes">yes</span>
+          <span className="row-label">
+            Your IP address at the hosting edge (our Cloudflare Worker strips identifying
+            headers before anything reaches our application server)
+          </span>
+          <span className="no">no</span>
           <span className="row-label">Your plaintext message</span>
           <span className="no">no</span>
           <span className="row-label">Your URL key</span>
@@ -236,10 +239,13 @@ export default function SecurityPage() {
             don&apos;t trust before pasting a secret.
           </li>
           <li>
-            <strong>We log standard web request metadata.</strong> IP, user-agent, timing — the
-            typical stuff kept by any Vercel-hosted site, for roughly an hour. Plaintext never
-            appears in those logs because the server never receives plaintext. For stronger
-            anonymity, reach the site via Tor or a VPN.
+            <strong>A Cloudflare Worker sits in front of the application.</strong> It strips
+            every identifying header — IP, user-agent, language, client-hints, geo — before the
+            request reaches our Vercel origin, so our application logs record{' '}
+            <code>0.0.0.0</code> and a constant user-agent. The source of the Worker is in the
+            public repo at <code>edge/worker.js</code>. Cloudflare itself still sees the real
+            client IP for a short retention window at the edge; that&apos;s the remaining
+            single-vendor trust. For stronger anonymity, reach the site via Tor or a VPN.
           </li>
         </ul>
       </section>
