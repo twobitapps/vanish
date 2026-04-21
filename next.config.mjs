@@ -34,7 +34,9 @@ const nextConfig = {
       { source: '/:path*', headers: securityHeaders },
       { source: '/m/:path*', headers: noStore },
       { source: '/s/:path*', headers: noStore },
-      { source: '/api/:path*', headers: noStore },
+      { source: '/api/create', headers: noStore },
+      { source: '/api/get/:path*', headers: noStore },
+      { source: '/api/short/:path*', headers: noStore },
     ];
   },
 };
