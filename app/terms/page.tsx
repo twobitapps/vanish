@@ -2,7 +2,19 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service — Vanish',
-  description: 'Terms, disclaimers, and limits for using Vanish. Experimental software, used at your own risk.',
+  description:
+    'Terms, disclaimers, and limits for using Vanish. Experimental software, used at your own risk.',
+  openGraph: {
+    title: 'Terms of Service — Vanish',
+    description: 'Experimental software · use at your own risk.',
+    images: [{ url: '/api/og?v=terms', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms of Service — Vanish',
+    description: 'Experimental software · use at your own risk.',
+    images: ['/api/og?v=terms'],
+  },
 };
 
 const EFFECTIVE = 'April 21, 2026';

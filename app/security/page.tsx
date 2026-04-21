@@ -4,6 +4,18 @@ export const metadata: Metadata = {
   title: 'How Vanish keeps your notes private',
   description:
     'The end-to-end encryption model behind Vanish, spelled out — what we see, what we don’t, and how to verify it yourself.',
+  openGraph: {
+    title: 'How Vanish keeps your notes private',
+    description:
+      'The end-to-end encryption model, spelled out — what we see, what we don’t, and how to verify it.',
+    images: [{ url: '/api/og?v=security', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How Vanish keeps your notes private',
+    description: 'The end-to-end encryption model, spelled out.',
+    images: ['/api/og?v=security'],
+  },
 };
 
 export default function SecurityPage() {
@@ -134,9 +146,18 @@ export default function SecurityPage() {
           </li>
         </ul>
         <p>
-          You can also read the files responsible for encryption: <code>lib/crypto.ts</code>{' '}
-          (AES-GCM, PBKDF2, HKDF helpers) and <code>app/page.tsx</code> (the create flow).
-          Nothing else touches the plaintext or the password.
+          The full source is public at{' '}
+          <a
+            href="https://github.com/twobitapps/vanish"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            github.com/twobitapps/vanish
+          </a>
+          . The files responsible for encryption are small and easy to read:{' '}
+          <code>lib/crypto.ts</code> (AES-GCM, PBKDF2, HKDF helpers) and{' '}
+          <code>app/page.tsx</code> (the create flow). Nothing else touches the plaintext or
+          the password.
         </p>
       </section>
 
