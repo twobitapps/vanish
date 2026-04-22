@@ -75,6 +75,13 @@ export default {
     });
 
     const out = new Response(response.body, response);
+    // Next.js + Vercel are emitting a stray `X-Robots-Tag: noindex` header on
+    // routes that are not supposed to carry it (including the apex). That header
+    // suppresses Twitter's card rendering. The HTML-level <meta name="robots">
+    // tag is still present for the routes that want it (/m/[id] note pages),
+    // so stripping the HTTP header here only removes the *extra* blanket
+    // signal — the per-route meta tags continue to do their job.
+    out.headers.delete('x-robots-tag');
     out.headers.set('x-vanish-proxy', '1');
     return out;
   },
